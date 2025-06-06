@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <title>Clientes a eliminar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+    <style>
+        /* Reset y Estilos Base */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #eef2f6; /* Fondo más suave */
+            color: #333;
+            overflow-x: hidden;
+            font-size: 14px; /* Tamaño de fuente base */
+        }
+
+        /* Styles for the main content (previously .login-box for some elements, now adjusted) */
+        .logout-button {
+            background-color: #f44336; /* Red for logout */
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            margin-top: 20px; /* Space from table */
+            transition: background-color 0.3s ease;
+            float: right; /* Align to the right */
+        }
+        .logout-button:hover {
+            background-color: #d32f2f;
+        }
+
+
+        /* Contenedor Principal */
+        .container {
+            width: 98%; /* Casi el 100% para evitar scroll lateral innecesario */
+            max-width: 98%; /* Un poco más ancho para pantallas grandes */
+            margin: 15px auto; /* Margen superior/inferior, centrado */
+            background-color: #ffffff;
+            padding: 25px; /* Padding ajustado */
+            border-radius: 12px; /* Bordes más redondeados */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
+            box-sizing: border-box;
+            animation: fadeIn 0.8s ease-out; /* Animación al cargar */
+            /* display: none; */ /* Ya no es necesario ocultar por defecto aquí, la lógica JS lo maneja al cargar los datos */
+        }
+
+        /* Título */
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 2.2em; /* Tamaño de fuente para el título */
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* Controles de Filtro */
+        .filter-controls {
+            display: flex;
+            gap: 20px; /* Espacio entre elementos */
+            margin-bottom: 25px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 15px;
+            background-color: #f8fbfd; /* Fondo ligero para los filtros */
+            border-radius: 8px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); /* Sombra interna */
+        }
+        .filter-controls label {
+            font-weight: 500; /* Semibold */
+            color: #444;
+            white-space: nowrap;
+            font-size: 1em;
+        }
+        .filter-controls select,
+        .filter-controls input[type="text"] {
+            padding: 10px 15px;
+            border: 1px solid #dcdcdc; /* Borde más suave */
+            border-radius: 6px; /* Bordes más redondeados */
+            font-size: 1em;
+            flex-grow: 1;
+            max-width: 220px; /* Ancho ajustado */
+            box-sizing: border-box;
+            transition: all 0.3s ease; /* Transición suave al foco */
+        }
+        .filter-controls select:focus,
+        .filter-controls input[type="text"]:focus {
+            border-color: #6a96e6; /* Borde azul al enfocar */
+            box-shadow: 0 0 0 3px rgba(106, 150, 230, 0.2); /* Sombra de foco */
+            outline: none;
+        }
+
+        /* Tabla */
+        table {
+            width: 100%;
+            border-collapse: separate; /* Para bordes redondeados en las celdas */
+            border-spacing: 0; /* Sin espacio entre celdas */
+            margin-top: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08); /* Sombra de tabla */
+            border-radius: 8px;
+            overflow: hidden; /* Asegura que los bordes redondeados se apliquen */
+        }
+        th, td {
+            border: 1px solid #ebf1f5; /* Bordes más claros */
+            padding: 12px 15px;
+            text-align: left;
+            vertical-align: middle;
+            font-size: 0.95em; /* Fuente ligeramente más grande */
+        }
+        th {
+            background-color: #4CAF50; /* Verde vibrante */
+            color: white;
+            font-weight: 600; /* Semibold */
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            white-space: nowrap;
+            text-transform: uppercase; /* Mayúsculas para encabezados */
+            letter-spacing: 0.2px;
+        }
+        th:first-child { border-top-left-radius: 8px; }
+        th:last-child { border-top-right-radius: 8px; }
+
+        tr:nth-child(even) {
+            background-color: #f9fcfd; /* Rayas sutiles */
+        }
+        tr:hover {
+            background-color: #e6f7ff; /* Resaltado azul suave al pasar el mouse */
+            transition: background-color 0.2s ease;
+        }
+
+        /* Elementos de la celda de la tabla */
+        .status-select {
+            padding: 8px 12px;
+            border: 1px solid #dcdcdc;
+            border-radius: 5px;
+            font-size: 0.9em;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: #fff;
+            cursor: pointer;
+        }
+        .supervisor-input, .comment-input { /* Agregado .comment-input */
+            width: calc(100% - 4px);
+            padding: 8px 12px;
+            border: 1px solid #dcdcdc;
+            border-radius: 5px;
+            font-size: 0.9em;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+        .update-button {
+            background-color: #007bff; /* Azul primario */
+            color: white;
+            border: none;
+            padding: 9px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 5px;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+        }
+        .update-button:hover {
+            background-color: #0056b3; /* Azul más oscuro al pasar el mouse */
+            transform: translateY(-1px); /* Efecto ligero de elevación */
+        }
+        .update-button:active {
+            transform: translateY(0); /* Efecto de clic */
+            box-shadow: none;
+        }
+        .photo-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .photo-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Etiquetas de Estado */
+        .status-tag {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px; /* Más redondeado, como una píldora */
+            font-weight: 600;
+            font-size: 0.8em;
+            margin-top: 8px; /* Más espacio */
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .status-Pendiente { background-color: #ffc107; color: #856404; } /* Amarillo con texto oscuro */
+        .status-Revisada { background-color: #17a2b8; color: white; } /* Azul-Cian */
+        .status-Aprobada { background-color: #28a745; color: white; } /* Verde */
+        .status-Rechazada { background-color: #dc3545; color: white; } /* Rojo */
+
+        /* Animaciones y Utilidades */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes highlight {
+            0% { background-color: #d4edda; } /* Verde claro */
+            100% { background-color: initial; } /* Vuelve al original */
+        }
+        .highlight-row {
+            animation: highlight 1.5s ease-out; /* Animación más larga */
+        }
+        .loading-indicator {
+            text-align: center;
+            padding: 30px;
+            font-size: 1.3em;
+            color: #666;
+            font-weight: 400;
+            animation: pulse 1.5s infinite ease-in-out; /* Animación de pulsación */
+        }
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+
+        /* --- Mensajes Bonitos --- */
+        #messageContainer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .app-message {
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            font-weight: 500;
+            color: white;
+            opacity: 0;
+            transform: translateX(100%);
+            animation: slideIn 0.5s forwards, fadeOut 0.5s forwards 3s; /* Entra, luego sale después de 3s */
+            min-width: 250px;
+            max-width: 350px;
+            box-sizing: border-box;
+        }
+        .app-message.success {
+            background-color: #28a745; /* Verde para éxito */
+        }
+        .app-message.error {
+            background-color: #dc3545; /* Rojo para error */
+        }
+        .app-message.info {
+            background-color: #17a2b8; /* Azul para información/advertencia */
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+
+        /* Responsividad */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                margin: 10px auto;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-controls select,
+            .filter-controls input[type="text"] {
+                max-width: 100%;
+            }
+            th, td {
+                padding: 8px 10px;
+            }
+            .status-select, .supervisor-input, .comment-input, .update-button { /* Agregado .comment-input */
+                font-size: 0.8em;
+                padding: 6px 10px;
+            }
+            #messageContainer {
+                top: 10px;
+                right: 10px;
+                left: 10px; /* Centra en móviles */
+                width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="main-content-container">
+        <button class="logout-button" onclick="signOutUser()">Cerrar Sesión</button>
+        <h1>Clientes a Eliminar</h1>
+        <div class="filter-controls">
+            <label for="filterStatus">Filtrar por Estado:</label>
+            <select id="filterStatus" onchange="filterClients()">
+                <option value="Todos">Todos</option>
+                <option value="Pendiente">Pendiente</option>
+                <option value="Revisada">Revisada</option>
+                <option value="Aprobada">Aprobada</option>
+                <option value="Rechazada">Rechazada</option>
+            </select>
+            <label for="filterSupervisor">Filtrar por Supervisor:</label>
+            <select id="filterSupervisor" onchange="filterClients()">
+                <option value="Todos">Todos</option>
+            </select>
+            <label for="searchClient">Buscar:</label>
+            <input type="text" id="searchClient" onkeyup="filterClients()" placeholder="Nombre o Código...">
+        </div>
+        <div id="clientsTableContainer">
+            <p class="loading-indicator">Cargando datos...</p>
+        </div>
+    </div>
+
+    <div id="messageContainer"></div>
+
+    <script>
+        // Tu configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBuklPcA-5OM5y44skoGi_tGCpkXdvHlLk",
+            authDomain: "supervisor-61c94.firebaseapp.com",
+            projectId: "supervisor-61c94",
+            storageBucket: "supervisor-61c94.firebasestorage.app",
+            messagingSenderId: "286415054345",
+            appId: "1:286415054345:web:8275a4d46d33d271757ad8",
+            measurementId: "G-5WYVWMSJ8Y"
+        };
+
+        // Inicializa Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth(); // Obtén la instancia de autenticación
+
+        let allClientsData = [];
+        let uniqueSupervisors = new Set();
+        let currentFilters = {
+            status: 'Todos',
+            supervisor: 'Todos',
+            searchTerm: ''
+        };
+        let lastUpdatedRowId = null;
+        let currentUserEmail = null; // Variable para almacenar el correo del usuario logueado
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // No cargamos datos ni filtros aquí, esperamos la autenticación de Firebase
+            // Firebase.auth().onAuthStateChanged se encargará de mostrar el contenido adecuado
+        });
+
+        // --- Funciones de Autenticación de Firebase ---
+
+        function signOutUser() {
+            auth.signOut()
+                .then(() => {
+                    showMessage('Sesión cerrada correctamente.', 'info');
+                    // Redirige a la página principal de login después de cerrar sesión
+                    window.top.location.href = 'https://script.google.com/macros/s/AKfycbwbSC8hBCLEN77N9_qGow2MVrMBF87e_l_y_0ec5lSqGT7KKt41wr14GlFOk8dxMU79KA/exec'; // **AJUSTAR A LA URL DE TU PÁGINA PRINCIPAL DE LOGIN**
+                })
+                .catch((error) => {
+                    showMessage('Error al cerrar sesión: ' + error.message, 'error');
+                });
+        }
+
+        // Observador del estado de autenticación
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // Usuario logueado
+                currentUserEmail = user.email; // Almacena el email del usuario logueado
+                // Notificar al Apps Script del usuario logueado (puedes usar esto para validaciones de backend)
+                // Se llama directamente a showMainContent si el usuario está logueado
+                showMainContent();
+                google.script.run.withSuccessHandler().handleFirebaseLoginSuccess(user.uid, user.email);
+            } else {
+                // Usuario no logueado
+                // Redirige a la página principal de login si no hay usuario autenticado
+                showMessage('No has iniciado sesión o tu sesión ha expirado. Redirigiendo al login...', 'error');
+                setTimeout(() => {
+                    window.top.location.href = 'https://script.google.com/macros/s/AKfycbwbSC8hBCLEN77N9_qGow2MVrMBF87e_l_y_0ec5lSqGT7KKt41wr14GlFOk8dxMU79KA/exec'; // **AJUSTAR A LA URL DE TU PÁGINA PRINCIPAL DE LOGIN**
+                }, 2000); // Dar tiempo para que el mensaje sea visible
+            }
+        });
+
+        // --- Funciones para mostrar/ocultar secciones (ahora simplificadas) ---
+
+        function showMainContent() {
+            // El contenedor principal ya no necesita ser mostrado con display: block
+            // Su display por defecto será manejado por CSS o se asume que está visible
+            // Aquí solo cargamos los datos si aún no se han cargado
+            if (allClientsData.length === 0) {
+                // 1. Recuperar filtros de localStorage al cargar la página
+                if (localStorage.getItem('filterStatus')) {
+                    currentFilters.status = localStorage.getItem('filterStatus');
+                }
+                if (localStorage.getItem('filterSupervisor')) {
+                    currentFilters.supervisor = localStorage.getItem('filterSupervisor');
+                }
+                if (localStorage.getItem('searchTerm')) {
+                    currentFilters.searchTerm = localStorage.getItem('searchTerm');
+                }
+
+                // 2. Establecer los valores en los elementos HTML INMEDIATAMENTE
+                document.getElementById('filterStatus').value = currentFilters.status;
+                document.getElementById('searchClient').value = currentFilters.searchTerm;
+                // El filtro del supervisor se establecerá después de obtener los datos en populateSupervisorFilter()
+
+                // 3. Cargar los datos y renderizar la tabla
+                fetchDataAndRenderTable();
+            } else {
+                // Si ya hay datos, solo aplica los filtros nuevamente
+                // Esto es útil si el usuario cerró sesión y volvió a iniciarla
+                document.getElementById('filterStatus').value = currentFilters.status;
+                document.getElementById('searchClient').value = currentFilters.searchTerm;
+                populateSupervisorFilter(); // Asegura que el filtro de supervisor se restaure
+                filterClients(false);
+            }
+        }
+
+        // --- Tus funciones existentes para el panel de supervisión ---
+
+        function fetchDataAndRenderTable() {
+            document.getElementById('clientsTableContainer').innerHTML = '<p class="loading-indicator">Cargando datos...</p>';
+            google.script.run
+                .withSuccessHandler(displayClients)
+                .withFailureHandler(function(error) {
+                    showMessage('Error al cargar los datos: ' + error.message, 'error');
+                    document.getElementById('clientsTableContainer').innerHTML = '<p style="color:red; text-align:center;">Error al cargar los datos.</p>';
+                })
+                .obtenerDatosClientes();
+        }
+
+        function displayClients(clients) {
+            allClientsData = clients;
+
+            // 1. Rellenar y establecer el filtro de supervisor
+            uniqueSupervisors = new Set(clients.map(client => client.supervisorAsignado).filter(Boolean));
+            populateSupervisorFilter(); // Esto ya usa currentFilters.supervisor
+
+            // 2. Asegurarse de que los otros filtros también reflejen los valores de currentFilters
+            // Esto es crucial para mantener los filtros al recargar la tabla
+            document.getElementById('filterStatus').value = currentFilters.status;
+            document.getElementById('searchClient').value = currentFilters.searchTerm;
+
+            // 3. Aplicar los filtros actuales
+            filterClients(false); // No guardar en localStorage de nuevo, ya se hizo al inicio o al cambiar manualmente
+        }
+
+        function populateSupervisorFilter() {
+            const selectElement = document.getElementById('filterSupervisor');
+            // Guarda el valor actual seleccionado antes de vaciar
+            const currentSelectedSupervisor = selectElement.value;
+
+            selectElement.innerHTML = '<option value="Todos">Todos</option>';
+            const sortedSupervisors = Array.from(uniqueSupervisors).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+            sortedSupervisors.forEach(supervisor => {
+                const option = document.createElement('option');
+                option.value = supervisor;
+                option.textContent = supervisor;
+                selectElement.appendChild(option);
+            });
+
+            // Intenta restaurar el valor previamente seleccionado
+            // Si el supervisor guardado no existe en las nuevas opciones, se seleccionará "Todos"
+            if (currentFilters.supervisor && selectElement.querySelector(`option[value="${currentFilters.supervisor}"]`)) {
+                selectElement.value = currentFilters.supervisor;
+            } else {
+                currentFilters.supervisor = 'Todos'; // Reset si el supervisor no existe o es nuevo
+                selectElement.value = 'Todos';
+            }
+        }
+
+        function renderTable(clientsToDisplay) {
+            const tableContainer = document.getElementById('clientsTableContainer');
+            if (clientsToDisplay.length === 0) {
+                tableContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No hay datos de clientes para mostrar con los filtros aplicados.</p>';
+                return;
+            }
+
+            let tableHtml = `
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Ruta</th>
+                                <th>Motivo</th>
+                                <th>Foto</th>
+                                <th>Fecha Venta</th>
+                                <th>Supervisor Asignado</th>
+                                <th>Región</th>
+                                <th>Estado Actual</th>
+                                <th>Nombre de Supervisor</th> <th>Comentarios</th> <th>Fecha de Revisión</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+            clientsToDisplay.forEach(client => {
+                const statusClass = `status-${client.estado.replace(/\s/g, '')}`;
+                const isHighlight = (client.id === lastUpdatedRowId) ? 'highlight-row' : '';
+
+                tableHtml += `
+                    <tr data-row-id="${client.id}" class="${isHighlight}">
+                        <td>${client.codigo}</td>
+                        <td>${client.nombre}</td>
+                        <td>${client.ruta}</td>
+                        <td>${client.motivo}</td>
+                        <td>${client.urlFoto && client.urlFoto !== 'Sin foto' ? `<a href="${client.urlFoto}" target="_blank" class="photo-link">Ver Foto</a>` : 'N/A'}</td>
+                        <td>${client.fecha}</td>
+                        <td>${client.supervisorAsignado}</td>
+                        <td>${client.region}</td>
+                        <td>
+                            <select class="status-select" onchange="this.dataset.changed='true'; updateStatusTag(this);">
+                                <option value="Pendiente" ${client.estado === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                                <option value="Revisada" ${client.estado === 'Revisada' ? 'selected' : ''}>Revisada</option>
+                                <option value="Aprobada" ${client.estado === 'Aprobada' ? 'selected' : ''}>Aprobada</option>
+                                <option value="Rechazada" ${client.estado === 'Rechazada' ? 'selected' : ''}>Rechazada</option>
+                            </select>
+                            <span class="status-tag ${statusClass}">${client.estado}</span>
+                        </td>
+                        <td>
+                            <input type="text" class="supervisor-input" placeholder="Nombre de Supervisor" value="${client.supervisorRevision || ''}" oninput="this.dataset.changed='true'">
+                        </td>
+                        <td>
+                            <input type="text" class="comment-input" placeholder="Añadir comentario" value="${client.comentarios || ''}" oninput="this.dataset.changed='true'">
+                        </td>
+                        <td>${client.fechaRevision || 'N/A'}</td>
+                        <td>
+                            <button class="update-button" onclick="updateClientStatus(this)">Actualizar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHtml += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            tableContainer.innerHTML = tableHtml;
+
+            if (lastUpdatedRowId) {
+                setTimeout(() => {
+                    const row = document.querySelector(`tr[data-row-id="${lastUpdatedRowId}"]`);
+                    if (row) {
+                        row.classList.remove('highlight-row');
+                    }
+                    lastUpdatedRowId = null;
+                }, 1500);
+            }
+        }
+
+        function updateStatusTag(selectElement) {
+            const newStatus = selectElement.value;
+            const statusTag = selectElement.parentNode.querySelector('.status-tag');
+            statusTag.textContent = newStatus;
+            statusTag.className = `status-tag status-${newStatus.replace(/\s/g, '')}`;
+        }
+
+        function filterClients(saveToLocalStorage = true) {
+            // Siempre actualiza currentFilters con los valores actuales de los elementos HTML
+            currentFilters.status = document.getElementById('filterStatus').value;
+            currentFilters.supervisor = document.getElementById('filterSupervisor').value;
+            currentFilters.searchTerm = document.getElementById('searchClient').value.toLowerCase();
+
+            if (saveToLocalStorage) {
+                localStorage.setItem('filterStatus', currentFilters.status);
+                localStorage.setItem('filterSupervisor', currentFilters.supervisor);
+                localStorage.setItem('searchTerm', currentFilters.searchTerm);
+            }
+
+            const filtered = allClientsData.filter(client => {
+                const matchesStatus = (currentFilters.status === 'Todos' || client.estado === currentFilters.status);
+                const matchesSupervisor = (currentFilters.supervisor === 'Todos' || client.supervisorAsignado === currentFilters.supervisor);
+                const matchesSearch = (client.nombre.toLowerCase().includes(currentFilters.searchTerm) || client.codigo.toLowerCase().includes(currentFilters.searchTerm));
+
+                return matchesStatus && matchesSupervisor && matchesSearch;
+            });
+
+            renderTable(filtered);
+        }
+
+        function updateClientStatus(buttonElement) {
+            const row = buttonElement.closest('tr');
+            const rowId = parseInt(row.dataset.rowId);
+            const statusSelect = row.querySelector('.status-select');
+            const supervisorInput = row.querySelector('.supervisor-input');
+            const commentInput = row.querySelector('.comment-input'); // Nuevo: Obtener el input de comentarios
+
+            const newStatus = statusSelect.value;
+            const supervisorQueRevisa = supervisorInput.value || currentUserEmail || 'Desconocido'; // Ahora toma el valor del input, si no, el email logueado
+            const newComment = commentInput.value; // Nuevo: Obtener el valor del comentario
+
+            if (statusSelect.dataset.changed !== 'true' && supervisorInput.dataset.changed !== 'true' && commentInput.dataset.changed !== 'true') { // Verificar también el comentario
+                showMessage('Parece que no hay cambios para actualizar.', 'info');
+                return;
+            }
+
+            statusSelect.dataset.changed = 'false';
+            supervisorInput.dataset.changed = 'false';
+            commentInput.dataset.changed = 'false'; // Reiniciar estado de cambio para el comentario
+
+            lastUpdatedRowId = rowId;
+
+            google.script.run
+                .withSuccessHandler(function(response) {
+                    if (response.status === 'success') {
+                        showMessage('¡Actualización exitosa! Los datos se han guardado.', 'success');
+                        fetchDataAndRenderTable(); // Recargar datos, lo que re-aplicará los filtros automáticamente
+                    } else {
+                        showMessage('Hubo un error al actualizar: ' + response.message, 'error');
+                    }
+                })
+                .actualizarEstadoCliente(rowId, newStatus, supervisorQueRevisa, newComment); // Asegúrate de que tu Apps Script reciba el comentario
+        }
+
+        // Función para mostrar mensajes de notificación
+        function showMessage(msg, type) {
+            const container = document.getElementById('messageContainer');
+            const messageElement = document.createElement('div');
+            messageElement.className = `app-message ${type}`;
+            messageElement.textContent = msg;
+            container.appendChild(messageElement);
+
+            setTimeout(() => {
+                messageElement.style.animation = 'fadeOut 0.5s forwards';
+                messageElement.addEventListener('animationend', () => {
+                    messageElement.remove();
+                });
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
