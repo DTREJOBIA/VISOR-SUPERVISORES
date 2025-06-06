@@ -26,7 +26,7 @@
     </script>
 
     <style>
-        /* Reset y Estilos Base */
+        /* (Tus estilos CSS, que parecen correctos) */
         html, body {
             height: 100%;
             margin: 0;
@@ -38,7 +38,6 @@
             font-size: 14px; /* Tamaño de fuente base */
         }
 
-        /* Styles for the main content (previously .login-box for some elements, now adjusted) */
         .logout-button {
             background-color: #f44336; /* Red for logout */
             color: white;
@@ -549,8 +548,8 @@
     </div>
 
     <script>
-        // URL de tu aplicación web de Google Apps Script (la de tu backend)
-        const APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyCJlyI2zX7ytDfDgIUNvvtwWf8E_qg2s4EJBj1bdw4n1P-TdpR5niz8Q138pGp5-P6lg/exec'; // ¡Pega la URL de tu Apps Script aquí!
+        // No necesitas APPS_SCRIPT_WEB_APP_URL si usas google.script.run
+        // const APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyCJlyI2zX7ytDfDgIUNvvtwWf8E_qg2s4EJBj1bdw4n1P-TdpR5niz8Q138pGp5-P6lg/exec'; // No utilizado directamente por google.script.run
 
         let allData = [];
         let filteredData = [];
@@ -579,7 +578,7 @@
                 showMessage('No has iniciado sesión o tu sesión ha expirado. Redirigiendo al login...', 'error');
                 setTimeout(() => {
                     // ¡AQUÍ ESTÁ EL CAMBIO CLAVE! Redirige a la URL de tu index.html en GitHub Pages
-                    window.top.location.href = 'https://dtrejobia.github.io/VISOR-SUPERVISORES/index.html'; // <--- ¡CAMBIA ESTA URL!
+                    window.top.location.href = 'https://dtrejobia.github.io/VISOR-SUPERVISORES/index.html'; // <--- ¡VERIFICA ESTA URL!
                 }, 2000); // Dar tiempo para que el mensaje sea visible
             }
         });
@@ -590,7 +589,7 @@
                 .then(() => {
                     showMessage('Sesión cerrada correctamente.', 'info');
                     // Después de cerrar sesión en Firebase, redirige a la página principal de login (index.html)
-                    window.top.location.href = 'https://dtrejobia.github.io/VISOR-SUPERVISORES/index.html'; // <--- ¡CAMBIA ESTA URL!
+                    window.top.location.href = 'https://dtrejobia.github.io/VISOR-SUPERVISORES/index.html'; // <--- ¡VERIFICA ESTA URL!
                 })
                 .catch((error) => {
                     showMessage('Error al cerrar sesión: ' + error.message, 'error');
@@ -609,7 +608,7 @@
                 .withFailureHandler(function(error) {
                     hideLoadingOverlay();
                     showMessage('Error al obtener datos: ' + error.message, 'error');
-                    console.error('Error al obtener datos:', error);
+                    console.error('Error al obtener datos de Apps Script:', error); // Agrega un console.error más específico
                 })
                 .obtenerDatosClientes(currentUserEmail); // Pasa el email del usuario para validación de backend
         }
@@ -810,15 +809,15 @@
 
         // Helper function to show messages
         function showMessage(msg, type) {
-            const messageContainer = document.getElementById('messageContainer');
-            const msgDiv = document.createElement('div');
+            const container = document.getElementById('messageContainer');
+            const msgDiv = document.createElement('div'); // Usamos msgDiv
             msgDiv.className = `app-message ${type}`;
             msgDiv.textContent = msg;
-            messageContainer.appendChild(msgDiv);
+            container.appendChild(msgDiv);
 
             setTimeout(() => {
                 msgDiv.style.animation = 'fadeOut 0.5s forwards';
-                messageElement.addEventListener('animationend', () => { // Fixed typo: messageElement instead of msgDiv
+                msgDiv.addEventListener('animationend', () => { // Corregido: Usar msgDiv aquí
                     msgDiv.remove();
                 });
             }, 3500); // Message disappears after 3.5 seconds (0.5s slideIn + 3s display)
