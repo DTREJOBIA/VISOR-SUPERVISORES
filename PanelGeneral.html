@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <title>Panel General de Registros</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset y Estilos Base */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #eef2f6;
+            color: #333;
+            overflow-x: hidden;
+            font-size: 14px;
+        }
+
+        /* Login Container Styles - REMOVED */
+        /* #login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f0f4f8;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .login-box {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+        .login-box h2 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2em;
+            font-weight: 700;
+        }
+        .login-box input {
+            width: calc(100% - 24px);
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            font-size: 1em;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+        .login-box input:focus {
+            border-color: #6a96e6;
+            outline: none;
+        }
+        .login-box button {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        .login-box button.primary {
+            background-color: #4CAF50;
+            color: white;
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+        }
+        .login-box button.primary:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+        .login-box #auth-message {
+            color: #dc3545;
+            margin-top: 15px;
+            font-size: 0.9em;
+        } */
+        .logout-button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+            float: right;
+        }
+        .logout-button:hover {
+            background-color: #d32f2f;
+        }
+
+
+        /* Contenedor Principal */
+        .container {
+            width: 98%;
+            max-width: 98%;
+            margin: 15px auto;
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            animation: fadeIn 0.8s ease-out;
+            /* display: none; */ /* Changed to block by default */
+        }
+
+        /* Título */
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 2.2em;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* Controles de Filtro */
+        .filter-controls {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 15px;
+            background-color: #f8fbfd;
+            border-radius: 8px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .filter-controls label {
+            font-weight: 500;
+            color: #444;
+            white-space: nowrap;
+            font-size: 1em;
+        }
+        .filter-controls select,
+        .filter-controls input[type="text"] {
+            padding: 10px 15px;
+            border: 1px solid #dcdcdc;
+            border-radius: 6px;
+            font-size: 1em;
+            flex-grow: 1;
+            max-width: 220px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        .filter-controls select:focus,
+        .filter-controls input[type="text"]:focus {
+            border-color: #6a96e6;
+            box-shadow: 0 0 0 3px rgba(106, 150, 230, 0.2);
+            outline: none;
+        }
+
+        /* Tabla */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #ebf1f5;
+            padding: 12px 15px;
+            text-align: left;
+            vertical-align: middle;
+            font-size: 0.95em;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 0.2px;
+        }
+        th:first-child { border-top-left-radius: 8px; }
+        th:last-child { border-top-right-radius: 8px; }
+
+        tr:nth-child(even) {
+            background-color: #f9fcfd;
+        }
+        tr:hover {
+            background-color: #e6f7ff;
+            transition: background-color 0.2s ease;
+        }
+
+        /* Elementos de la celda de la tabla */
+        .status-select {
+            padding: 8px 12px;
+            border: 1px solid #dcdcdc;
+            border-radius: 5px;
+            font-size: 0.9em;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: #fff;
+            cursor: pointer;
+        }
+        .supervisor-input, .comment-input {
+            width: calc(100% - 4px);
+            padding: 8px 12px;
+            border: 1px solid #dcdcdc;
+            border-radius: 5px;
+            font-size: 0.9em;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+        .update-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 9px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 5px;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+        }
+        .update-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-1px);
+        }
+        .update-button:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+        .photo-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .photo-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Etiquetas de Estado */
+        .status-tag {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8em;
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        /* Actualización de las clases de estilo para los nuevos estados */
+        .status-Pendiente { background-color: #ffc107; color: #856404; }
+        .status-ClienteCreado { background-color: #28a745; color: white; } /* Verde para "Cliente Creado" */
+        .status-Rechazada { background-color: #dc3545; color: white; }    /* Rojo para "Rechazada" */
+
+
+        /* Animaciones y Utilidades */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes highlight {
+            0% { background-color: #d4edda; }
+            100% { background-color: initial; }
+        }
+        .highlight-row {
+            animation: highlight 1.5s ease-out;
+        }
+        .loading-indicator {
+            text-align: center;
+            padding: 30px;
+            font-size: 1.3em;
+            color: #666;
+            font-weight: 400;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+
+        /* --- Mensajes Bonitos --- */
+        #messageContainer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .app-message {
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            font-weight: 500;
+            color: white;
+            opacity: 0;
+            transform: translateX(100%);
+            animation: slideIn 0.5s forwards, fadeOut 0.5s forwards 3s;
+            min-width: 250px;
+            max-width: 350px;
+            box-sizing: border-box;
+        }
+        .app-message.success {
+            background-color: #28a745;
+        }
+        .app-message.error {
+            background-color: #dc3545;
+        }
+        .app-message.info {
+            background-color: #17a2b8;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+
+        /* Responsividad */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                margin: 10px auto;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-controls select,
+            .filter-controls input[type="text"] {
+                max-width: 100%;
+            }
+            th, td {
+                padding: 8px 10px;
+            }
+            .status-select, .supervisor-input, .comment-input, .update-button {
+                font-size: 0.8em;
+                padding: 6px 10px;
+            }
+            #messageContainer {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                width: auto;
+            }
+            /* .login-box { REMOVED
+                padding: 25px;
+            }
+            .login-box h2 { REMOVED
+                font-size: 1.8em;
+            } */
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="main-content-container">
+        <h1>Clientes nuevos</h1>
+        <div class="filter-controls">
+            <label for="filterStatus">Filtrar por Estado:</label>
+            <select id="filterStatus" onchange="filterClients()">
+                <option value="Todos">Todos</option>
+                <option value="Pendiente">Pendiente</option>
+                <option value="Cliente Creado">Cliente Creado</option>
+                <option value="Rechazada">Rechazada</option>
+            </select>
+            <label for="filterSupervisorForm">Filtrar por Supervisor del Formulario:</label>
+            <select id="filterSupervisorForm" onchange="filterClients()">
+                <option value="Todos">Todos</option>
+            </select>
+            <label for="searchClient">Buscar:</label>
+            <input type="text" id="searchClient" onkeyup="filterClients()" placeholder="Nombre, ID, RTN, Teléfono...">
+        </div>
+        <div id="clientsTableContainer">
+            <p class="loading-indicator">Cargando datos...</p>
+        </div>
+    </div>
+
+    <div id="messageContainer"></div>
+
+    <script>
+        // Firebase configuration and initialization are no longer needed
+        // const firebaseConfig = {
+        //     apiKey: "AIzaSyBuklPcA-5OM5y44skoGi_tGCpkXdvHlLk",
+        //     authDomain: "supervisor-61c94.firebaseapp.com",
+        //     projectId: "supervisor-61c94",
+        //     storageBucket: "supervisor-61c94.firebasestorage.app",
+        //     messagingSenderId: "286415054345",
+        //     appId: "1:286415054345:web:8275a4d46d33d271757ad8",
+        //     measurementId: "G-5WYVWMSJ8Y"
+        // };
+        // firebase.initializeApp(firebaseConfig);
+        // const auth = firebase.auth();
+
+        let allClientsData = [];
+        let uniqueSupervisorsForm = new Set();    // Para el supervisor del formulario
+        let currentFilters = {
+            status: 'Todos',
+            supervisorForm: 'Todos', // Único filtro de supervisor
+            searchTerm: ''
+        };
+        let lastUpdatedRowId = null;
+        let currentUserEmail = 'Usuario de la página principal'; // Placeholder for current user email
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Directly show main content and fetch data, assuming the main page handles login status
+            showMainContent();
+        });
+
+        // --- Authentication functions removed ---
+        // function signInUser() { ... }
+        // function signOutUser() { ... }
+        // auth.onAuthStateChanged((user) => { ... });
+
+        function showLoginForm() {
+            // This function is no longer called, but kept for completeness in case it's called elsewhere
+            // document.getElementById('login-container').style.display = 'flex';
+            document.getElementById('main-content-container').style.display = 'none';
+        }
+
+        function showMainContent(backendResponse) {
+            // document.getElementById('login-container').style.display = 'none'; // No login container to hide
+            document.getElementById('main-content-container').style.display = 'block';
+
+            // No backendResponse status check needed from Firebase login
+            // if (backendResponse && backendResponse.status === 'error') {
+            //     showMessage(backendResponse.message, 'error');
+            //     document.getElementById('clientsTableContainer').innerHTML = '<p style="color:red; text-align:center;">' + backendResponse.message + '</p>';
+            //     return;
+            // }
+
+            // Always fetch data when content is shown, as there's no auth flow here
+            // This ensures data is loaded when the page is accessed from the main app
+            // Recuperar filtros del localStorage
+            if (localStorage.getItem('generalPanelFilterStatus')) {
+                currentFilters.status = localStorage.getItem('generalPanelFilterStatus');
+            }
+            if (localStorage.getItem('generalPanelFilterSupervisorForm')) {
+                currentFilters.supervisorForm = localStorage.getItem('generalPanelFilterSupervisorForm');
+            }
+            if (localStorage.getItem('generalPanelSearchTerm')) {
+                currentFilters.searchTerm = localStorage.getItem('generalPanelSearchTerm');
+            }
+
+            document.getElementById('filterStatus').value = currentFilters.status;
+            document.getElementById('searchClient').value = currentFilters.searchTerm;
+            
+            fetchDataAndRenderTable();
+        }
+
+        // --- Funciones adaptadas para la NUEVA HOJA DE CÁLCULO GENERAL ---
+
+        function fetchDataAndRenderTable() {
+            document.getElementById('clientsTableContainer').innerHTML = '<p class="loading-indicator">Cargando datos...</p>';
+            google.script.run
+                .withSuccessHandler(function(response) {
+                    if (response.status === 'error') {
+                        showMessage('Error al cargar los datos: ' + response.message, 'error');
+                        document.getElementById('clientsTableContainer').innerHTML = '<p style="color:red; text-align:center;">' + response.message + '</p>';
+                    } else {
+                        allClientsData = response;
+                        // Poblamos solo el Set de supervisores del formulario
+                        uniqueSupervisorsForm = new Set(allClientsData.map(client => client.supervisorOriginal).filter(Boolean));
+                        
+                        populateSupervisorFilterForm(); // Llenar solo el filtro del formulario
+                        filterClients(false);
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    showMessage('Error al cargar los datos: ' + error.message, 'error');
+                    document.getElementById('clientsTableContainer').innerHTML = '<p style="color:red; text-align:center;">Error al cargar los datos.</p>';
+                })
+                .obtenerDatosRegistrosGenerales(); // LLAMADA A LA FUNCIÓN DEL SERVIDOR
+        }
+
+        // Función para poblar solo el selector de supervisor del formulario
+        function populateSupervisorFilterForm() {
+            const selectForm = document.getElementById('filterSupervisorForm');
+            selectForm.innerHTML = '<option value="Todos">Todos</option>';
+            const sortedSupervisorsForm = Array.from(uniqueSupervisorsForm).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+            sortedSupervisorsForm.forEach(supervisor => {
+                const option = document.createElement('option');
+                option.value = supervisor;
+                option.textContent = supervisor;
+                selectForm.appendChild(option);
+            });
+            if (currentFilters.supervisorForm && selectForm.querySelector(`option[value="${currentFilters.supervisorForm}"]`)) {
+                selectForm.value = currentFilters.supervisorForm;
+            } else {
+                currentFilters.supervisorForm = 'Todos';
+                selectForm.value = 'Todos';
+            }
+        }
+
+
+        function renderTable(clientsToDisplay) {
+            const tableContainer = document.getElementById('clientsTableContainer');
+            if (clientsToDisplay.length === 0) {
+                tableContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No hay datos de registros para mostrar con los filtros aplicados.</p>';
+                return;
+            }
+
+            let tableHtml = `
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Canal</th>
+                                <th>Latitud</th>
+                                <th>Longitud</th>
+                                <th>Identidad</th>
+                                <th>RTN</th>
+                                <th>Nombre Comercial</th>
+                                <th>Contacto</th>
+                                <th>Teléfono</th>
+                                <th>Dirección</th>
+                                <th>Ruta</th>
+                                <th>Semana</th>
+                                <th>Día</th>
+                                <th>Departamento</th>
+                                <th>Municipio</th>
+                                <th>Fotografía</th>
+                                <th>Supervisor Form</th>
+                                <th>Región Form</th>
+                                <th>Estado Actual</th>
+                                <th>Supervisor Revisión</th>
+                                <th>Comentarios</th>
+                                <th>Fecha Revisión</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+            clientsToDisplay.forEach(client => {
+                // Modificación aquí para las clases de estilo de estado
+                const statusClass = `status-${client.estadoActual.replace(/\s/g, '')}`;
+                const isHighlight = (client.id === lastUpdatedRowId) ? 'highlight-row' : '';
+                const fotografiaLink = client.fotografiaUrl && client.fotografiaUrl !== 'Sin foto' ? `<a href="${client.fotografiaUrl}" target="_blank" class="photo-link">Ver Foto</a>` : 'Sin foto';
+
+                tableHtml += `
+                    <tr data-row-id="${client.id}" class="${isHighlight}">
+                        <td>${client.fechaRegistro}</td>
+                        <td>${client.canal}</td>
+                        <td>${client.latitud}</td>
+                        <td>${client.longitud}</td>
+                        <td>${client.identidad}</td>
+                        <td>${client.rtn || 'N/A'}</td>
+                        <td>${client.nombreComercial}</td>
+                        <td>${client.contactoNegocio || 'N/A'}</td>
+                        <td>${client.telefono || 'N/A'}</td>
+                        <td>${client.direccion || 'N/A'}</td>
+                        <td>${client.ruta || 'N/A'}</td>
+                        <td>${client.semana || 'N/A'}</td>
+                        <td>${client.dia || 'N/A'}</td>
+                        <td>${client.departamento || 'N/A'}</td>
+                        <td>${client.municipio || 'N/A'}</td>
+                        <td>${fotografiaLink}</td>
+                        <td>${client.supervisorOriginal || 'N/A'}</td>
+                        <td>${client.regionOriginal || 'N/A'}</td>
+                        <td>
+                            <select class="status-select" onchange="this.dataset.changed='true'; updateStatusTag(this);">
+                                <option value="Pendiente" ${client.estadoActual === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                                <option value="Cliente Creado" ${client.estadoActual === 'Cliente Creado' ? 'selected' : ''}>Cliente Creado</option>
+                                <option value="Rechazada" ${client.estadoActual === 'Rechazada' ? 'selected' : ''}>Rechazada</option>
+                            </select>
+                            <span class="status-tag ${statusClass}">${client.estadoActual}</span>
+                        </td>
+                        <td>
+                            <input type="text" class="supervisor-input" placeholder="Nombre de Supervisor" value="${client.nombreSupervisor || ''}" oninput="this.dataset.changed='true'">
+                        </td>
+                        <td>
+                            <input type="text" class="comment-input" placeholder="Añadir comentario" value="${client.comentarios || ''}" oninput="this.dataset.changed='true'">
+                        </td>
+                        <td>${client.fechaRevision || 'N/A'}</td>
+                        <td>
+                            <button class="update-button" onclick="updateClientStatus(this)">Actualizar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHtml += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            tableContainer.innerHTML = tableHtml;
+
+            if (lastUpdatedRowId) {
+                setTimeout(() => {
+                    const row = document.querySelector(`tr[data-row-id="${lastUpdatedRowId}"]`);
+                    if (row) {
+                        row.classList.remove('highlight-row');
+                    }
+                    lastUpdatedRowId = null;
+                }, 1500);
+            }
+        }
+
+        function updateStatusTag(selectElement) {
+            const newStatus = selectElement.value;
+            const statusTag = selectElement.parentNode.querySelector('.status-tag');
+            statusTag.textContent = newStatus;
+            // Actualización para manejar los espacios en "Cliente Creado" en la clase CSS
+            statusTag.className = `status-tag status-${newStatus.replace(/\s/g, '')}`;
+        }
+
+        function filterClients(saveToLocalStorage = true) {
+            currentFilters.status = document.getElementById('filterStatus').value;
+            currentFilters.supervisorForm = document.getElementById('filterSupervisorForm').value; // Solo este filtro de supervisor
+            currentFilters.searchTerm = document.getElementById('searchClient').value.toLowerCase();
+
+            if (saveToLocalStorage) {
+                localStorage.setItem('generalPanelFilterStatus', currentFilters.status);
+                localStorage.setItem('generalPanelFilterSupervisorForm', currentFilters.supervisorForm); // Guardar solo este
+                localStorage.setItem('generalPanelSearchTerm', currentFilters.searchTerm);
+            }
+
+            const filtered = allClientsData.filter(client => {
+                const matchesStatus = (currentFilters.status === 'Todos' || client.estadoActual === currentFilters.status);
+                const matchesSupervisorForm = (currentFilters.supervisorForm === 'Todos' || client.supervisorOriginal === currentFilters.supervisorForm); // Solo este filtro
+                
+                const matchesSearch = (
+                    client.nombreComercial.toLowerCase().includes(currentFilters.searchTerm) ||
+                    (client.identidad && client.identidad.toLowerCase().includes(currentFilters.searchTerm)) ||
+                    (client.rtn && client.rtn.toLowerCase().includes(currentFilters.searchTerm)) ||
+                    (client.telefono && client.telefono.toLowerCase().includes(currentFilters.searchTerm)) ||
+                    (client.departamento && client.departamento.toLowerCase().includes(currentFilters.searchTerm)) ||
+                    (client.municipio && client.municipio.toLowerCase().includes(currentFilters.searchTerm)) ||
+                    (client.ruta && client.ruta.toLowerCase().includes(currentFilters.searchTerm)) ||
+                    (client.canal && client.canal.toLowerCase().includes(currentFilters.searchTerm)) ||
+                    (client.contactoNegocio && client.contactoNegocio.toLowerCase().includes(currentFilters.searchTerm)) ||
+                    (client.supervisorOriginal && client.supervisorOriginal.toLowerCase().includes(currentFilters.searchTerm)) ||
+                    (client.regionOriginal && client.regionOriginal.toLowerCase().includes(currentFilters.searchTerm)) ||
+                    (client.nombreSupervisor && client.nombreSupervisor.toLowerCase().includes(currentFilters.searchTerm)) // También busca por el supervisor de revisión en el campo de búsqueda general
+                );
+
+                return matchesStatus && matchesSupervisorForm && matchesSearch; // Ajustar la condición
+            });
+
+            renderTable(filtered);
+        }
+
+        function updateClientStatus(buttonElement) {
+            const row = buttonElement.closest('tr');
+            const rowId = parseInt(row.dataset.rowId);
+
+            const statusSelect = row.querySelector('.status-select');
+            const supervisorInput = row.querySelector('.supervisor-input');
+            const commentInput = row.querySelector('.comment-input');
+
+            const newStatus = statusSelect.value;
+            const supervisorQueRevisa = supervisorInput.value || currentUserEmail || 'Desconocido';
+            const newComment = commentInput.value;
+
+            if (statusSelect.dataset.changed !== 'true' && supervisorInput.dataset.changed !== 'true' && commentInput.dataset.changed !== 'true') {
+                showMessage('Parece que no hay cambios para actualizar.', 'info');
+                return;
+            }
+
+            statusSelect.dataset.changed = 'false';
+            supervisorInput.dataset.changed = 'false';
+            commentInput.dataset.changed = 'false';
+
+            lastUpdatedRowId = rowId;
+
+            google.script.run
+                .withSuccessHandler(function(response) {
+                    if (response.status === 'success') {
+                        showMessage('¡Actualización exitosa! Los datos se han guardado.', 'success');
+                        fetchDataAndRenderTable();
+                    } else {
+                        showMessage('Hubo un error al actualizar: ' + response.message, 'error');
+                        lastUpdatedRowId = null;
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    showMessage('Error de comunicación con el servidor: ' + error.message, 'error');
+                    lastUpdatedRowId = null;
+                })
+                .actualizarEstadoRegistroGeneral(rowId, newStatus, supervisorQueRevisa, newComment);
+        }
+
+        // Helper function to show messages
+        function showMessage(message, type) {
+            const messageContainer = document.getElementById('messageContainer');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `app-message ${type}`;
+            msgDiv.textContent = message;
+            messageContainer.appendChild(msgDiv);
+
+            setTimeout(() => {
+                msgDiv.remove();
+            }, 3500); // Message disappears after 3.5 seconds (0.5s slideIn + 3s display)
+        }
+
+    </script>
+</body>
+</html>
