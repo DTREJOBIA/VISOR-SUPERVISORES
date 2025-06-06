@@ -26,7 +26,7 @@
     </script>
 
     <style>
-        /* (Tus estilos CSS, que parecen correctos) */
+        /* Estilos CSS (los mismos que tenías, funcionan bien) */
         html, body {
             height: 100%;
             margin: 0;
@@ -548,8 +548,9 @@
     </div>
 
     <script>
-        // No necesitas APPS_SCRIPT_WEB_APP_URL si usas google.script.run
-        // const APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyCJlyI2zX7ytDfDgIUNvvtwWf8E_qg2s4EJBj1bdw4n1P-TdpR5niz8Q138pGp5-P6lg/exec'; // No utilizado directamente por google.script.run
+        // URL de tu aplicación web de Google Apps Script (la de tu backend)
+        // Aunque google.script.run no la usa directamente, es útil tenerla como referencia.
+        const APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyCJlyI2zX7ytDfDgIUNvvtwWf8E_qg2s4EJBj1bdw4n1P-TdpR5niz8Q138pGp5-P6lg/exec'; // ¡Pega la URL de tu Apps Script aquí!
 
         let allData = [];
         let filteredData = [];
@@ -569,16 +570,18 @@
                 // Usuario logueado en Firebase
                 currentUserEmail = user.email; // Guarda el email del usuario logueado
                 console.log('Usuario autenticado:', currentUserEmail);
-                // Si el usuario está logueado, procede a cargar los datos
+                // Si el usuario está logueado, procede a cargar los datos y mostrar el contenido
                 showLoadingOverlay();
                 fetchDataAndRenderTable();
+                // Ocultar overlay si el contenido ya está cargado por una recarga o caché del navegador
+                // Esto es solo para asegurar, fetchDataAndRenderTable ya lo oculta al tener éxito/falla
             } else {
                 // Usuario NO logueado en Firebase: Redirige a la página principal de login (index.html)
                 console.log('No hay usuario autenticado. Redirigiendo a la página de login.');
                 showMessage('No has iniciado sesión o tu sesión ha expirado. Redirigiendo al login...', 'error');
                 setTimeout(() => {
-                    // ¡AQUÍ ESTÁ EL CAMBIO CLAVE! Redirige a la URL de tu index.html en GitHub Pages
-                    window.top.location.href = 'https://dtrejobia.github.io/VISOR-SUPERVISORES/index.html'; // <--- ¡VERIFICA ESTA URL!
+                    // ¡AQUÍ ESTÁ LA URL CLAVE! Redirige a la URL de tu index.html en GitHub Pages
+                    window.top.location.href = 'https://dtrejobia.github.io/VISOR-SUPERVISORES/index.html'; // <--- ¡VERIFICA Y CAMBIA ESTA URL!
                 }, 2000); // Dar tiempo para que el mensaje sea visible
             }
         });
@@ -589,7 +592,7 @@
                 .then(() => {
                     showMessage('Sesión cerrada correctamente.', 'info');
                     // Después de cerrar sesión en Firebase, redirige a la página principal de login (index.html)
-                    window.top.location.href = 'https://dtrejobia.github.io/VISOR-SUPERVISORES/index.html'; // <--- ¡VERIFICA ESTA URL!
+                    window.top.location.href = 'https://dtrejobia.github.io/VISOR-SUPERVISORES/index.html'; // <--- ¡VERIFICA Y CAMBIA ESTA URL!
                 })
                 .catch((error) => {
                     showMessage('Error al cerrar sesión: ' + error.message, 'error');
@@ -608,7 +611,7 @@
                 .withFailureHandler(function(error) {
                     hideLoadingOverlay();
                     showMessage('Error al obtener datos: ' + error.message, 'error');
-                    console.error('Error al obtener datos de Apps Script:', error); // Agrega un console.error más específico
+                    console.error('Error al obtener datos de Apps Script:', error);
                 })
                 .obtenerDatosClientes(currentUserEmail); // Pasa el email del usuario para validación de backend
         }
@@ -810,14 +813,14 @@
         // Helper function to show messages
         function showMessage(msg, type) {
             const container = document.getElementById('messageContainer');
-            const msgDiv = document.createElement('div'); // Usamos msgDiv
+            const msgDiv = document.createElement('div');
             msgDiv.className = `app-message ${type}`;
             msgDiv.textContent = msg;
             container.appendChild(msgDiv);
 
             setTimeout(() => {
                 msgDiv.style.animation = 'fadeOut 0.5s forwards';
-                msgDiv.addEventListener('animationend', () => { // Corregido: Usar msgDiv aquí
+                msgDiv.addEventListener('animationend', () => {
                     msgDiv.remove();
                 });
             }, 3500); // Message disappears after 3.5 seconds (0.5s slideIn + 3s display)
