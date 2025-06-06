@@ -371,12 +371,12 @@
 
         // --- Funciones de Autenticación de Firebase ---
 
-        function signOutUser() {
+    function signOutUser() {
             auth.signOut()
                 .then(() => {
                     showMessage('Sesión cerrada correctamente.', 'info');
                     // Redirige a la página principal de login después de cerrar sesión
-                    window.top.location.href = 'https://script.google.com/macros/s/AKfycbwbSC8hBCLEN77N9_qGow2MVrMBF87e_l_y_0ec5lSqGT7KKt41wr14GlFOk8dxMU79KA/exec'; // **AJUSTAR A LA URL DE TU PÁGINA PRINCIPAL DE LOGIN**
+                    window.top.location.href = 'https://script.google.com/macros/s/AKfycbyCJlyI2zX7ytDfDgIUNvvtwWf8E_qg2s4EJBj1bdw4n1P-TdpR5niz8Q138pGp5-P6lg/exec'; // Tu nuevo URL
                 })
                 .catch((error) => {
                     showMessage('Error al cerrar sesión: ' + error.message, 'error');
@@ -392,12 +392,12 @@
                 // Se llama directamente a showMainContent si el usuario está logueado
                 showMainContent();
                 google.script.run.withSuccessHandler().handleFirebaseLoginSuccess(user.uid, user.email);
-            } else {
+           } else {
                 // Usuario no logueado
                 // Redirige a la página principal de login si no hay usuario autenticado
                 showMessage('No has iniciado sesión o tu sesión ha expirado. Redirigiendo al login...', 'error');
                 setTimeout(() => {
-                    window.top.location.href = 'https://script.google.com/macros/s/AKfycbwbSC8hBCLEN77N9_qGow2MVrMBF87e_l_y_0ec5lSqGT7KKt41wr14GlFOk8dxMU79KA/exec'; // **AJUSTAR A LA URL DE TU PÁGINA PRINCIPAL DE LOGIN**
+                    window.top.location.href = 'https://script.google.com/macros/s/AKfycbyCJlyI2zX7ytDfDgIUNvvtwWf8E_qg2s4EJBj1bdw4n1P-TdpR5niz8Q138pGp5-P6lg/exec'; // Tu nuevo URL
                 }, 2000); // Dar tiempo para que el mensaje sea visible
             }
         });
